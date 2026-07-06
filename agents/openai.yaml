@@ -1,0 +1,3 @@
+﻿display_name: Anti-Hardcode Engineering
+short_description: Prevent brittle hardcoded fixes while coding.
+default_prompt: Use the anti-hardcode-engineering skill before implementing changes. Classify the problem as closed-set, open-world, or adapter-boundary; choose the right abstraction; and add tests that cannot pass by hardcoding only the observed example.
