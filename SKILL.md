@@ -1,4 +1,4 @@
-﻿---
+---
 name: anti-hardcode-engineering
 description: Use before and during coding when designing, implementing, or reviewing bug fixes, features, routing logic, intent detection, parser behavior, agent/tool runtime behavior, policy checks, validation gates, UI extraction, scraping, or any change where an agent may be tempted to solve the task with hardcoded keywords, language-specific lists, brittle selectors, copied examples, provider strings, magic paths, or one-off special cases. Apply this skill to classify closed-set versus open-world problems, choose abstraction boundaries such as obligations, capabilities, contracts, parsers, verifiers, registries, or adapters, and require tests that cannot pass by merely hardcoding the observed example.
 ---
