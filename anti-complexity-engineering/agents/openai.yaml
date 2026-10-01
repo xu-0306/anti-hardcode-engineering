@@ -1,0 +1,3 @@
+display_name: Anti-Complexity Engineering
+short_description: Prevent accidental complexity and layer accretion while designing.
+default_prompt: Use the anti-complexity-engineering skill before designing or changing this. Check how a reference implementation does it, map the feature onto existing primitives, list every new concept with its observed requirement, and state what the change deletes or merges.

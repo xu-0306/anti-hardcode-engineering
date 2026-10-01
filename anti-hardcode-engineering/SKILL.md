@@ -44,6 +44,8 @@ This skill fixes a specific open-world bug at one boundary. It is not an archite
 - The fix would add a new per-turn semantic pass, new entity, new status, or new table. Prefer deleting or merging an existing layer; if something must be added, state what it replaces.
 - The problem is genuinely closed-set or trivial. An explicit mapping or one-line fix is the right answer; do not upgrade it into a classifier.
 
+For system-level design decisions (new entities, layers, plans), use the companion skill anti-complexity-engineering.
+
 ## Pre-Implementation Gate
 
 Before implementing, answer these internally and let them guide the edit:

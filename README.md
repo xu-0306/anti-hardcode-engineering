@@ -1,82 +1,39 @@
-﻿# Anti-Hardcode Engineering
+# Engineering Guardrails
 
-A Codex skill for preventing brittle, one-off engineering fixes before they enter the codebase.
+Skills for coding agents (Codex, Claude Code, and other agents that load `SKILL.md` folders) that keep changes from going wrong in two opposite directions.
 
-This skill is intended for implementation-time use, not only after-the-fact review. It helps an agent decide whether a change is a closed-set mapping, an open-world/generalizable behavior, or an adapter-boundary compatibility case before writing code.
+| Skill | Prevents | Use when |
+|---|---|---|
+| [anti-hardcode-engineering](anti-hardcode-engineering/) | fixes that are too narrow: keyword lists, copied examples, brittle selectors, provider strings | fixing a specific open-world bug at one boundary |
+| [anti-complexity-engineering](anti-complexity-engineering/) | designs that are too big: extra entities, parallel lifecycles, predict-then-gate layers, plans that only add | designing features, writing plans, reviewing changes that add concepts |
 
-## What It Prevents
+They are meant to be used together. anti-hardcode-engineering chooses the right abstraction for one bug; anti-complexity-engineering keeps that abstraction from spreading into a global layer, and its concept budget takes precedence when the two conflict.
 
-- Patching natural-language intent bugs with language-specific keyword lists as the source of truth
-- Fixing parser or tool-call issues with scattered substring checks
-- Solving UI, scraping, or extraction bugs with brittle selectors or copied examples
-- Adding provider-, path-, or screenshot-specific conditionals without an abstraction boundary
-- Writing tests that only prove the observed bug report was hardcoded correctly
+## anti-complexity-engineering in short
 
-## Core Principle
+1. Reference alignment: check how a mature implementation does the same feature before designing.
+2. Primitive mapping: express the feature with existing primitives first.
+3. Concept budget: every new entity, status, table, field, or layer needs an observed requirement.
+4. Deletion ledger: every change says what it deletes or merges.
+5. Proportional planning: plan size matches the change.
 
-Use hardcoded values only for closed sets, such as official enums, protocol statuses, API fields, centralized configuration, or adapter-local provider quirks.
-
-For open-world problems, prefer durable mechanisms such as:
-
-- obligations
-- capabilities
-- contracts
-- parsers
-- verifiers
-- registries
-- policy objects
-- adapter boundaries
-
-## Typical Use Cases
-
-Use this skill when implementing or reviewing:
-
-- bug fixes
-- agent/tool runtime behavior
-- intent detection and routing
-- parser behavior
-- validation gates
-- policy checks
-- UI extraction
-- scraping or document extraction
-- any change that could be solved too narrowly by hardcoding the current example
-
-## When Not To Use
-
-This skill targets a specific open-world bug at one boundary; it is not an architecture. Don't install its obligation/verifier pipeline as a global per-turn or per-subagent layer, don't predict obligations and then gate them when exposed tools can define capability, and check reference implementations or existing primitives before adding new contracts, entities, or states. See the "When NOT To Use" section in `SKILL.md`.
+Security, data-loss prevention, real concurrency issues, required audit, and measured performance work are explicitly kept.
 
 ## Installation
 
-Copy this folder into your Codex skills directory:
-
-```powershell
-C:\Users\Xu\.codex\skills\anti-hardcode-engineering
-```
-
-Or install it into any configured skills path as:
+Copy one or both skill folders into your skills directory, for example:
 
 ```text
-anti-hardcode-engineering/
-  SKILL.md
-  agents/openai.yaml
+~/.codex/skills/anti-hardcode-engineering/
+~/.codex/skills/anti-complexity-engineering/
+~/.claude/skills/anti-complexity-engineering/
 ```
+
+Each folder contains `SKILL.md` and `agents/openai.yaml` (UI metadata).
 
 ## Usage
 
-Reference the skill explicitly in a coding task:
-
 ```text
-Use anti-hardcode-engineering while implementing this fix.
+Use anti-complexity-engineering while designing this feature.
+Use anti-hardcode-engineering and anti-complexity-engineering while fixing this bug.
 ```
-
-The skill asks the agent to report:
-
-- classification: closed set, open world, or adapter boundary
-- chosen abstraction: parser, obligation, verifier, registry, policy object, etc.
-- anti-hardcode test: a variant or negative case that defeats one-off hardcoding
-- remaining hardcodes: why they are acceptable, or none
-
-## Files
-
-- `SKILL.md` - the actual skill instructions
-- `agents/openai.yaml` - UI metadata for the skill
