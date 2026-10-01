@@ -33,6 +33,17 @@ Before editing code, classify the problem:
 
 If the user request, bug report, or failing test involves natural language, model behavior, agent planning, tool selection, artifact creation, scraping, parsing provider text, or user intent, assume open set until proven otherwise.
 
+## When NOT To Use
+
+This skill fixes a specific open-world bug at one boundary. It is not an architecture. Do not apply it, or scale it back, when:
+
+- The change would install the obligation pipeline (derive obligation -> expose capability -> track -> block before final) as a global layer on every turn, request, or subagent. Use it only at the single boundary where the observed bug lives.
+- Capability can be expressed by which tools are actually exposed. A read-only worker simply has no write tool; do not let a model predict obligations and then gate them. Predict-then-gate layers create the failures they guard against.
+- A reference implementation or an existing primitive (agent loop, tool, session, config) already covers the behavior. Check how mature projects solve it before adding a contract, verifier, or entity.
+- The risk is hypothetical. Do not build validation layers for failures that have not occurred and cannot be tested.
+- The fix would add a new per-turn semantic pass, new entity, new status, or new table. Prefer deleting or merging an existing layer; if something must be added, state what it replaces.
+- The problem is genuinely closed-set or trivial. An explicit mapping or one-line fix is the right answer; do not upgrade it into a classifier.
+
 ## Pre-Implementation Gate
 
 Before implementing, answer these internally and let them guide the edit:
@@ -49,7 +60,7 @@ If answers are unclear, inspect neighboring architecture before editing.
 
 ### For Intent And Agent Runtime Bugs
 
-Prefer a pipeline like:
+At the boundary where the bug lives (not as a per-turn layer; see When NOT To Use), prefer a pipeline like:
 
 1. derive task obligation from the request and context
 2. expose tools/capabilities required to satisfy the obligation
@@ -125,6 +136,7 @@ Reject or revise a fix when any item is true:
 - It claims success without verifying the requested side effect.
 - It spreads special cases across unrelated modules instead of adding one adapter or contract.
 - It hides uncertainty with fallback success, default zeros, or silent no-ops.
+- It adds a semantic layer that runs on every turn, or a new entity, status, or table, without removing or merging an existing one.
 
 Approve when:
 

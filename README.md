@@ -41,6 +41,10 @@ Use this skill when implementing or reviewing:
 - scraping or document extraction
 - any change that could be solved too narrowly by hardcoding the current example
 
+## When Not To Use
+
+This skill targets a specific open-world bug at one boundary; it is not an architecture. Don't install its obligation/verifier pipeline as a global per-turn or per-subagent layer, don't predict obligations and then gate them when exposed tools can define capability, and check reference implementations or existing primitives before adding new contracts, entities, or states. See the "When NOT To Use" section in `SKILL.md`.
+
 ## Installation
 
 Copy this folder into your Codex skills directory:
