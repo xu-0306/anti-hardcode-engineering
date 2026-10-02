@@ -1,6 +1,6 @@
 ---
 name: anti-complexity-engineering
-description: Use before and during designing features, writing implementation plans, fixing bugs, or reviewing changes in systems that keep growing, especially agent runtimes, orchestration, workflows, plugins, scheduling, and other features that mature projects already ship. Trigger when a change adds a new entity, status, table, protocol, layer, contract, verifier, manager, or per-request pass; when a bug fix wraps another layer around existing code; when a plan has many stages; or when a diff only adds and never deletes. Apply this skill to align with reference implementations, map features onto existing primitives, budget new concepts, record what each change deletes or merges, and keep plans proportional. Skip for mechanical edits with no design decision.
+description: Use when designing, planning, fixing bugs, or reviewing changes that add an entity, status, table, protocol, layer, contract, verifier, or per-request pass, or when a bug fix wraps a layer around existing code. Aligns with reference implementations, maps features onto existing primitives, budgets new concepts, records deletions, and keeps plans proportional. Skip for mechanical edits.
 ---
 
 # Anti-Complexity Engineering
@@ -54,6 +54,7 @@ Every change states what it deletes, merges, or makes obsolete, or "nothing, bec
 
 - Fix the root cause in place. Do not wrap another guard, verifier, contract, or fallback around a component to catch its failures.
 - If a bug exists only because of a layer (a prediction that is then gated, a cache of derived state, a translation between two models of the same thing), removing that layer is the first candidate fix.
+- Root-layer statement, required for every bug fix: name the layer the bug comes from (or "none"), and say whether removing it is the root fix. If you keep the layer for now, list its removal under Deferred with the trigger that would justify doing it. A fix around a suspect layer without this statement is incomplete.
 - Deletion test: imagine deleting the module. If complexity vanishes, delete it. If it reappears across callers, keep it.
 - Chesterton's fence: learn why a layer exists (callers, tests, history) before deleting it. Unknown purpose is a reason to investigate, not to stack more around it.
 - Code with no production caller is a deletion candidate, not a foundation.
@@ -110,6 +111,7 @@ Reject or revise a change when any item is true:
 
 - It adds a concept without a budget row.
 - It wraps a layer around a component instead of fixing the component.
+- It fixes a bug without the root-layer statement, or keeps a suspect layer without listing its removal under Deferred.
 - It creates a second entity or lifecycle for an existing idea.
 - It adds a per-request pass (classifier, verifier, contract) for a failure observed once, at one place.
 - It deletes nothing and does not say why.
@@ -126,10 +128,11 @@ Approve when:
 
 ## Response Pattern
 
-When reporting a relevant design, plan, or fix, include a concise note:
+When reporting a relevant design, plan, or fix, include a concise note. If the user asks for a specific output format, append the note to it rather than dropping it.
 
 - Reference: how <reference> does it, in one line
 - Primitive mapping: the composition used
 - Concept budget: +N / -M, with the added concepts named
 - Deletion ledger: what was removed or merged, or "nothing, because ..."
-- Deferred: what was intentionally not built, and what would trigger adding it
+- Root layer (bug fixes): the layer the bug comes from, and whether removing it is the root fix
+- Deferred: what was intentionally not built or removed, including any kept suspect layer, and what would trigger the change
