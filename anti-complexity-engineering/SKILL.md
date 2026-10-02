@@ -13,6 +13,8 @@ Every concept must earn its place against a reference and an observed requiremen
 
 A concept is anything a maintainer must learn: an entity, status, table, config field, protocol, layer, pass that runs on every request, or a new name for an existing thing.
 
+For a bug fix, first ask: would this bug exist if the layer it occurs in did not exist? If not, that layer is the root cause, even when patching around it is the smaller change. See the root-layer statement in section 4.
+
 ## 1. Reference Alignment
 
 Before designing, find how at least one mature implementation solves the same problem: a vendored `reference/` directory, a dependency, or a well-known open-source project. Write one line:
@@ -53,8 +55,10 @@ Before implementing, list every concept the change adds:
 Every change states what it deletes, merges, or makes obsolete, or "nothing, because ...".
 
 - Fix the root cause in place. Do not wrap another guard, verifier, contract, or fallback around a component to catch its failures.
-- If a bug exists only because of a layer (a prediction that is then gated, a cache of derived state, a translation between two models of the same thing), removing that layer is the first candidate fix.
-- Root-layer statement, required for every bug fix: name the layer the bug comes from (or "none"), and say whether removing it is the root fix. If you keep the layer for now, list its removal under Deferred with the trigger that would justify doing it. A fix around a suspect layer without this statement is incomplete.
+- Root-layer statement, required for every bug fix:
+  - Name the layer the bug occurs in and answer the counterfactual: would the bug exist without it? "None" is a valid answer when the bug is in core logic.
+  - Classify that layer. A **boundary** limits what can happen: exposed tools, sandbox, permissions, validation at a trust boundary. Keep it and fix it in place. A **derived layer** restates something the system already knows or decides: a prediction then enforced by a gate, a cache of derived state, a translation between two models of the same thing. It is the suspect.
+  - When a derived layer is the root cause, a minimal fix now plus a Deferred entry for removing that layer is the expected outcome. The removal need not happen in this change, but keeping the layer without a Deferred entry is incomplete.
 - Deletion test: imagine deleting the module. If complexity vanishes, delete it. If it reappears across callers, keep it.
 - Chesterton's fence: learn why a layer exists (callers, tests, history) before deleting it. Unknown purpose is a reason to investigate, not to stack more around it.
 - Code with no production caller is a deletion candidate, not a foundation.
@@ -111,7 +115,7 @@ Reject or revise a change when any item is true:
 
 - It adds a concept without a budget row.
 - It wraps a layer around a component instead of fixing the component.
-- It fixes a bug without the root-layer statement, or keeps a suspect layer without listing its removal under Deferred.
+- It fixes a bug without the root-layer statement, keeps a derived root-cause layer without a Deferred removal entry, or removes or weakens a boundary to make a bug go away.
 - It creates a second entity or lifecycle for an existing idea.
 - It adds a per-request pass (classifier, verifier, contract) for a failure observed once, at one place.
 - It deletes nothing and does not say why.
@@ -128,11 +132,11 @@ Approve when:
 
 ## Response Pattern
 
-When reporting a relevant design, plan, or fix, include a concise note. If the user asks for a specific output format, append the note to it rather than dropping it.
+When reporting a relevant design, plan, or fix, include a concise note. If the user requires a specific output format, put each item inside its closest section of that format (for example root layer and deferred removals under deletions) rather than dropping it.
 
 - Reference: how <reference> does it, in one line
 - Primitive mapping: the composition used
 - Concept budget: +N / -M, with the added concepts named
 - Deletion ledger: what was removed or merged, or "nothing, because ..."
-- Root layer (bug fixes): the layer the bug comes from, and whether removing it is the root fix
+- Root layer (bug fixes): the layer, boundary or derived, and whether the bug would exist without it
 - Deferred: what was intentionally not built or removed, including any kept suspect layer, and what would trigger the change
